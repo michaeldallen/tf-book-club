@@ -9,7 +9,7 @@ resource "aws_instance" "helloworld-instance" {
 
   user_data = <<-EOF
     #!/bin/bash
-    echo "biteme" > index.html
+    echo "mallen-tf-book-club-chapter2-instance" > index.html
     nohup busybox httpd -f -p ${var.server_port} &
   EOF
 
