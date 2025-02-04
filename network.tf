@@ -64,3 +64,13 @@ resource "aws_route_table_association" "hello-world-public-rt-assoc" {
   route_table_id = aws_route_table.hello-world-public-rt.id
 }
 
+
+
+resource "aws_eip" "hello-world-eip" {
+  instance = aws_instance.hello-world-instance.id
+  domain   = "vpc"
+
+  tags = {
+    Name = "hello-world-eip"
+  }
+}
