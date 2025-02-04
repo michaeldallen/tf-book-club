@@ -1,8 +1,8 @@
 
 
-resource "aws_security_group" "helloworld-security-group" {
+resource "aws_security_group" "hello-world-security-group" {
 
-  name = "mallen-tf-book-club-chapter2-sg"
+  name = "hello-world-security-group"
 
   ingress {
     from_port   = var.server_port
@@ -13,4 +13,46 @@ resource "aws_security_group" "helloworld-security-group" {
 
 }
 
+
+resource "aws_vpc" "hello-world-vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "hello-world-vpc"
+  }
+}
+
+
+
+resource "aws_subnet" "hello-world-public-subnet" {
+  vpc_id                  = aws_vpc.hello-world-vpc.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_region}a"
+
+  tags = {
+    Name = "hello-world-public-subnet"
+  }
+}
+
+
+resource "aws_route_table" "hello-world-public-rt" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name = "hello-world-public-rt"
+  }
+}
+
+
+resource "aws_route_table_association" "hello-world-public-rt-assoc" {
+  subnet_id      = aws_subnet.hello-world-public-subnet.id
+  route_table_id = aws_route_table.hello-world-public-rt.id
+}
 
