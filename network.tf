@@ -37,12 +37,20 @@ resource "aws_subnet" "hello-world-public-subnet" {
 }
 
 
+resource "aws_internet_gateway" "hello-world-igw" {
+    vpc_id = aws_vpc.hello-world-vpc.id
+
+      tags = {
+            Name = "hello-world-igw"
+              }
+            }
+
 resource "aws_route_table" "hello-world-public-rt" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.hello-world-vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
+    gateway_id = aws_internet_gateway.hello-world-igw.id
   }
 
   tags = {

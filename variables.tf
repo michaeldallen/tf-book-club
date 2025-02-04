@@ -4,3 +4,8 @@ variable "server_port" {
   default     = 8080
 }
 
+variable "aws_region" {
+  description = "The AWS region to create resources in"
+  default     = "us-east-1"
+}
+

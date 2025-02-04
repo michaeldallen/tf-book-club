@@ -15,7 +15,7 @@ resource "aws_instance" "helloworld-instance" {
 
   user_data_replace_on_change = true
 
-  vpc_security_group_ids = [aws_security_group.helloworld-security-group.id]
+  vpc_security_group_ids = [aws_security_group.hello-world-security-group.id]
 
 }
 
