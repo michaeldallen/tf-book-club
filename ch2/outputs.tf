@@ -3,13 +3,11 @@ output "public_ip" {
   description = "The public IP address of the Hello World instance"
 }
 
-output "vpc_id" {
-  value       = data.aws_vpc.ch2_vpc.id
-  description = "id of chapter 2 vpc"
+output "default-vpc-id" {
+  value = data.aws_vpc.default-vpc.id
 }
 
 
-output "subnet_id" {
-  value       = data.aws_subnet.ch2_pub_subnet.id
-  description = "id of chapter 2 public subnet"
+output "default-subnets" { 
+  value = data.aws_subnets.default-subnets
 }
