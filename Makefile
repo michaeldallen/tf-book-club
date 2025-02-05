@@ -2,8 +2,6 @@
 
 DOT-TERRAFORM := /tmp/dot-terraform
 
-default : make.targets
-
 make.targets :
 	@echo "available Make targets:"
 	@$(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null \
