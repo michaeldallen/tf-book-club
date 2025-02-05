@@ -10,13 +10,16 @@ resource "aws_instance" "ch2-httpd" {
               #!/bin/bash
               yum update -y
               yum install -y httpd
+              sed -i 's/Listen 80/Listen ${var.server_port}/' /etc/httpd/conf/httpd.conf
               systemctl start httpd
               systemctl enable httpd
-              echo "<h1>Hello, World!</h1>" > /var/www/html/index.html
+              echo "hello, world" > /var/www/html/index.html
               EOF
 
+  user_data_replace_on_change = true
+
   tags = {
-    Name = "HelloWorld"
+    Name = "ch2-hw"
   }
 }
 
