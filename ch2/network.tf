@@ -1,3 +1,19 @@
+data "aws_vpc" "ch2_vpc" {
+  filter {
+    name   = "tag:Name"
+    values = ["ch2-vpc"]
+  }
+}
+
+data "aws_subnet" "ch2_pub_subnet" {
+  vpc_id = data.aws_vpc.ch2_vpc.id
+
+  filter {
+    name   = "tag:Name"
+    values = ["ch2-pub-sn"]
+  }
+}
+
 resource "aws_vpc" "ch2-vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true

@@ -40,6 +40,9 @@ tf.plan.local : tf.init.local
 tf.apply : tf.init
 	terraform apply
 
+tf.apply! : tf.init
+	terraform apply --auto-approve
+
 tf.apply.local : tf.init.local
 	terraform apply
 

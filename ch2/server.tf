@@ -62,7 +62,7 @@ resource "aws_autoscaling_group" "ch2-asg" {
 
   min_size            = 2
   max_size            = 10
-  vpc_zone_identifier = [aws_subnet.ch2-pub-sn.id]
+  vpc_zone_identifier = [data.aws_subnet.ch2_pub_subnet.id]
 
 
   tag {
