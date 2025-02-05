@@ -5,6 +5,6 @@ variable "aws_region" {
 
 variable "server_port" {
   description = "port for receiving http requests"
-  type = number
-  default = 8080
+  type        = number
+  default     = 8080
 }
