@@ -49,3 +49,10 @@ tf.apply.local : tf.init.local
 tf.apply.local! : tf.init.local
 	terraform apply --auto-approve
 
+tf.destroy : tf.init
+	terraform destroy
+
+tf.destroy! : tf.init
+	terraform destroy --auto-approve
+
+
