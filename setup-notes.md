@@ -8,6 +8,3 @@ https://stackoverflow.com/questions/62184910/increase-disk-storage-for-google-cl
 
 
 ```
-mv -vi .terraform /tmp
-ln -s /tmp/.terraform .terraform
-```
