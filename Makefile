@@ -10,6 +10,20 @@ make.targets :
 		| sed "s/^/    make /" \
 		| sort -f -k2,2 -k1,1
 
+user : user.tf
+
+user.tf : ${HOME}/bin/terraform
+
+${HOME}/bin/terraform : ${HOME}/bin ${HOME}/.tfenv
+	@tfenv install $$(tfenv list-remote | fgrep -v -- - | head -1)
+	@tfenv use $$(tfenv list-remote | fgrep -v -- - | head -1)
+
+${HOME}/bin : 
+	mkdir -v ${HOME}/bin
+
+${HOME}/.tfenv :
+	git clone https://github.com/tfutils/tfenv.git ${HOME}/.tfenv
+	ln -s ${HOME}/.tfenv/bin/* ~/bin/
 
 tf.dot-terraform.install :
 	@[ -d ${DOT-TERRAFORM} ] && echo "ok ... ${DOT-TERRAFORM}" || mkdir -pv ${DOT-TERRAFORM}
@@ -21,7 +35,7 @@ tf.dot-terraform.clean :
 	@[ -L .terraform ] && rm -fv .terraform || echo no .terraform
 
 
-tf.init : tf.dot-terraform.install
+tf.init : tf.dot-terraform.install user.tf
 	terraform init
 
 tf.init.local : tf.dot-terraform.install
