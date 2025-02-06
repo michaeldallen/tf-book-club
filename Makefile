@@ -8,7 +8,7 @@ make.targets :
 		| awk -v RS= -F: '/^# Implicit Rules/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
 		| fgrep -v '%' \
 		| sed "s/^/    make /" \
-		| env LC_COLLATE=C sort
+		| sort -f -k2,2 -k1,1
 
 
 tf.dot-terraform.install :
@@ -54,5 +54,9 @@ tf.destroy : tf.init
 
 tf.destroy! : tf.init
 	terraform destroy --auto-approve
+
+
+tfbc.ch2.test : 
+	curl $$(terraform output --raw alb-dns-name):$$(terraform output --raw server-port)
 
 
