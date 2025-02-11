@@ -49,9 +49,12 @@ ${HOME}/.tfenv :
 	ln -s ${HOME}/.tfenv/bin/* ~/bin/
 
 tf.dot-terraform.install :
-	@[ -d ${DOT_TERRAFORM} ] && echo "ok ... ${DOT_TERRAFORM}" || mkdir -pv ${DOT_TERRAFORM}
-	@[ ! -L .terraform -a -d .terraform ] && { echo local local directory .terraform exists. cannot install .terraform symlink to ${DOT_TERRAFORM} ; exit 1 ; } || echo "ok ... no local .terraform"
-	@[ -L .terraform  -a "$$(readlink -f .terraform)" = "${DOT_TERRAFORM}" ] && echo "ok ... .terraform -> ${DOT_TERRAFORM}" || ln -sv ${DOT_TERRAFORM} .terraform
+	@if [ -d .terraform -a ! -L .terraform ] ; then \
+		echo "*** warning: using existing local .terraform - you will probably run out of space soon if you are using cloudshell" ; \
+	else \
+		[ -d ${DOT_TERRAFORM} ] && echo "ok ... ${DOT_TERRAFORM}" || mkdir -pv ${DOT_TERRAFORM} ; \
+		[ -L .terraform  -a "$$(readlink -f .terraform)" = "${DOT_TERRAFORM}" ] && echo "ok ... .terraform -> ${DOT_TERRAFORM}" || ln -sv ${DOT_TERRAFORM} .terraform ; \
+		fi
 
 tf.dot-terraform.clean : 
 	@[ -d ${DOT_TERRAFORM} ] && rm -rfv ${DOT_TERRAFORM} || echo no ${DOT_TERRAFORM}
