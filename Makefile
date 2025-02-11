@@ -3,6 +3,7 @@
 DOT_TERRAFORM := /tmp/dot-terraform
 
 TERRAFORM_VERSION := 1.10.5
+TERRAGRUNT_VERSION := 0.73.0
 
 make.targets :
 	@echo "available Make targets:"
@@ -15,9 +16,9 @@ make.targets :
 
 env : env.user env.tf
 
-env.user : env.user.bin env.user.tfenv
+env.user : env.user.bin env.user.tfenv env.user.tgswitch
 
-env.tf : env.tf.install
+env.tf : env.tf.install env.tg.install
 
 env.tf.install.list-remote : env.user
 	@tfenv list-remote 
@@ -37,6 +38,12 @@ env.tf.install.% : env.user
 	@tfenv install $*
 	@tfenv use $*
 
+env.tg.install : env.user
+	@tgswitch ${TERRAGRUNT_VERSION}
+
+env.tg.install.% : env.user
+	@tgswitch $*
+
 env.user.bin : ${HOME}/bin
 
 ${HOME}/bin :
@@ -47,6 +54,11 @@ env.user.tfenv : env.user.bin ${HOME}/.tfenv
 ${HOME}/.tfenv :
 	git clone https://github.com/tfutils/tfenv.git ${HOME}/.tfenv
 	ln -s ${HOME}/.tfenv/bin/* ~/bin/
+
+env.user.tgswitch : env.user.bin ${HOME}/bin/tgswitch
+
+${HOME}/bin/tgswitch : 
+	curl -L https://raw.githubusercontent.com/warrensbox/tgswitch/release/install.sh | env BINDIR=$${HOME}/bin bash
 
 tf.dot-terraform.install :
 	@[ -d .terraform ] && echo .terraform ok || mkdir -pv .terraform
