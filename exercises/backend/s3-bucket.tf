@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "tf-state-bucket" {
-  bucket = var.backend_storage_name
+  bucket = var.backend_storage
 
   lifecycle {
-    prevent_destroy = true
+    //    prevent_destroy = true
   }
 
 }

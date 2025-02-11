@@ -19,3 +19,4 @@ output "launch-template-version" {
   value = aws_launch_template.ch2-httpd-lt.latest_version
 }
 
+

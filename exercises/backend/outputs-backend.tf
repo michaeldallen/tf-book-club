@@ -1,4 +1,7 @@
-output "backend_storage_name" {
-  value = var.backend_storage_name
+output "backend_storage" {
+  value = var.backend_storage
 }
 
+output "backend_lock_table" {
+  value = var.backend_lock_table
+}
