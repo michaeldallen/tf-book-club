@@ -49,19 +49,21 @@ ${HOME}/.tfenv :
 	ln -s ${HOME}/.tfenv/bin/* ~/bin/
 
 tf.dot-terraform.install :
-	@if [ -d .terraform -a ! -L .terraform ] ; then \
-		echo "*** warning: using existing local .terraform - you will probably run out of space soon if you are using cloudshell" ; \
+	@[ -d .terraform ] && echo .terraform ok || mkdir -pv .terraform
+	@if [ -d .terraform/providers -a ! -L .terraform/providers ] ; then \
+		echo "*** warning: using existing local .terraform/providers - you will probably run out of space soon if you are using cloudshell" ; \
 	else \
-		[ -d ${DOT_TERRAFORM} ] && echo "ok ... ${DOT_TERRAFORM}" || mkdir -pv ${DOT_TERRAFORM} ; \
-		[ -L .terraform  -a "$$(readlink -f .terraform)" = "${DOT_TERRAFORM}" ] && echo "ok ... .terraform -> ${DOT_TERRAFORM}" || ln -sv ${DOT_TERRAFORM} .terraform ; \
+		[ -d ${DOT_TERRAFORM}/providers ] && echo "ok ... ${DOT_TERRAFORM}/providers" || mkdir -pv ${DOT_TERRAFORM}/providers ; \
+		[ -L .terraform/providers  -a "$$(readlink -f .terraform/providers)" = "${DOT_TERRAFORM}/providers" ] && echo "ok ... .terraform/providers -> ${DOT_TERRAFORM}/providers" || ln -sv ${DOT_TERRAFORM}/providers .terraform/providers ; \
 		fi
 
 tf.dot-terraform.clean : 
-	@[ -d ${DOT_TERRAFORM} ] && rm -rfv ${DOT_TERRAFORM} || echo no ${DOT_TERRAFORM}
-	@[ -L .terraform ] && rm -fv .terraform || echo no .terraform
+	@[ -d ${DOT_TERRAFORM}/providers ] && rm -rfv ${DOT_TERRAFORM}/providers || echo no ${DOT_TERRAFORM}/providers
+	@[ -L .terraform/providers ] && rm -fv .terraform/providers || echo no .terraform/providers
 
 
 tf.init : tf.dot-terraform.install env
+	@terraform fmt -check *.tf || echo "you should run 'terraform fmt *tf' so your code is even more beautiful"
 	terraform init
 
 tf.init.local : tf.dot-terraform.install env
@@ -95,6 +97,14 @@ tf.destroy : tf.init env
 tf.destroy! : tf.init env
 	terraform destroy --auto-approve
 
+tf.output : tf.init env
+	terraform output
+
+tf.fmt : 
+	terraform fmt -check *.tf && echo ok || echo needs formatting
+
+tf.fmt! : 
+	terraform fmt *.tf
 
 tfbc.ch2.test : 
 	curl $$(terraform output --raw alb-dns-name):$$(terraform output --raw server-port)
