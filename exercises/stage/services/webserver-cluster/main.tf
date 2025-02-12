@@ -1,7 +1,7 @@
 data "terraform_remote_state" "db" {
   backend = "s3"
   config = {
-    bucket = "tf-book-club-state"
+    bucket = "tfbc-state"
     key    = "stage/data-stores/mysql/terraform.tfstate"
     region = "us-east-1"
   }
@@ -159,10 +159,10 @@ resource "aws_lb_listener_rule" "tfbc-rule" {
 
 terraform {
   backend "s3" {
-    bucket         = "tf-book-club-state"
+    bucket         = "tfbc-state"
     key            = "stage/services/webserver-cluster/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "tf-book-club-locks"
+    dynamodb_table = "tfbc-locks"
     encrypt        = true
   }
 }
