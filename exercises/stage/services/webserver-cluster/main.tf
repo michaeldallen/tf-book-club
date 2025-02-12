@@ -159,7 +159,7 @@ resource "aws_lb_listener_rule" "tfbc-rule" {
 
 terraform {
   backend "s3" {
-    bucket = "tf-book-club-state"
+    bucket         = "tf-book-club-state"
     key            = "stage/services/webserver-cluster/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "tf-book-club-locks"
