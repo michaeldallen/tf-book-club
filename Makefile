@@ -113,10 +113,10 @@ tf.output : tf.init env
 	terraform output
 
 tf.fmt : 
-	terraform fmt -check *.tf && echo ok || echo needs formatting
+	@terraform fmt -check *.tf > /dev/null && echo ok ... format || terraform fmt -check *.tf | sed 's/$$/ needs formatting/' 
 
 tf.fmt! : 
-	terraform fmt *.tf
+	@terraform fmt *.tf | sed 's/$$/ formatted/'
 
 tfbc.ch2.test : 
 	curl $$(terraform output --raw alb-dns-name):$$(terraform output --raw server-port)
