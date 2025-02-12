@@ -1,3 +1,12 @@
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
+    bucket = "tf-book-club-state"
+    key    = "stage/data-stores/mysql/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 
 resource "aws_launch_template" "tfbc-lt" {
 
@@ -7,16 +16,11 @@ resource "aws_launch_template" "tfbc-lt" {
 
   vpc_security_group_ids = [aws_security_group.tfbc-sg.id]
 
-  user_data = base64encode(<<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              sed -i 's/Listen 80/Listen ${var.server_port}/' /etc/httpd/conf/httpd.conf
-              systemctl start httpd
-              systemctl enable httpd
-              echo "hello, tfbc" > /var/www/html/index.html
-              EOF
-  )
+  user_data = base64encode(templatefile("user-data.sh", {
+    server_port = var.server_port
+    db_address  = data.terraform_remote_state.db.outputs.address
+    db_port     = data.terraform_remote_state.db.outputs.port
+  }))
 
   lifecycle {
     create_before_destroy = true
@@ -155,8 +159,8 @@ resource "aws_lb_listener_rule" "tfbc-rule" {
 
 terraform {
   backend "s3" {
-    bucket         = "tf-book-club-state"
-    key            = "global/s3/terraform.tfstate"
+    bucket = "tf-book-club-state"
+    key            = "stage/services/webserver-cluster/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "tf-book-club-locks"
     encrypt        = true
