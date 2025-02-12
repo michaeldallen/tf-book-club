@@ -118,7 +118,10 @@ tf.fmt :
 tf.fmt! : 
 	@terraform fmt *.tf | sed 's/$$/ formatted/'
 
+
 tfbc.ch2.test : 
 	curl $$(terraform output --raw alb-dns-name):$$(terraform output --raw server-port)
 
+tfbc.ch3.test : 
+	echo http://$$(terraform output --raw alb-dns-name):$$(terraform output --raw server-port)
 
