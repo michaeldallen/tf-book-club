@@ -8,3 +8,10 @@ output "dynamodb_table_name" {
   value = aws_dynamodb_table.tf-book-club-locks.name
 
 }
+output "state_storage" {
+  value = var.state_storage
+}
+
+output "state_lock_table" {
+  value = var.state_lock_table
+}
