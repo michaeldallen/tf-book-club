@@ -1,5 +1,5 @@
 resource "aws_db_instance" "example" {
-  identifier_prefix   = "tf-book-club"
+  identifier_prefix   = "tfbc-"
   engine              = "mysql"
   allocated_storage   = 10
   instance_class      = "db.t3.micro"
@@ -12,10 +12,10 @@ resource "aws_db_instance" "example" {
 }
 terraform {
   backend "s3" {
-    bucket         = "tf-book-club-state"
+    bucket         = "tfbc-state"
     key            = "stage/data-stores/mysql/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "tf-book-club-locks"
+    dynamodb_table = "tfbc-locks"
     encrypt        = true
   }
 }
