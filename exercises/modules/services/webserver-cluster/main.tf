@@ -1,8 +1,8 @@
 data "terraform_remote_state" "db" {
   backend = "s3"
   config = {
-    bucket = "tfbc-state"
-    key    = "stage/data-stores/mysql/terraform.tfstate"
+    bucket = "${var.db_remote_state_bucket}"
+    key    = "${var.db_remote_state_key}"
     region = "us-east-1"
   }
 }
@@ -10,13 +10,13 @@ data "terraform_remote_state" "db" {
 
 resource "aws_launch_template" "tfbc-lt" {
 
-  name_prefix   = "tfbc-"
+  name_prefix   = "${var.cluster_name}-"
   image_id      = "ami-0df8c184d5f6ae949"
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.tfbc-sg.id]
 
-  user_data = base64encode(templatefile("user-data.sh", {
+  user_data = base64encode(templatefile("${path.module}/user-data.sh", {
     server_port = var.server_port
     db_address  = data.terraform_remote_state.db.outputs.address
     db_port     = data.terraform_remote_state.db.outputs.port
@@ -51,7 +51,7 @@ resource "aws_autoscaling_group" "tfbc-asg" {
 
   tag {
     key                 = "Name"
-    value               = "tfbc-asg"
+    value               = "${var.cluster_name}-asg"
     propagate_at_launch = true
   }
 
@@ -73,7 +73,7 @@ data "aws_subnets" "default-subnets" {
 
 resource "aws_security_group" "tfbc-sg" {
 
-  name        = "allow_http"
+  name        = "${var.cluster_name}-sg"
   description = "Allow HTTP inbound traffic"
   vpc_id      = data.aws_vpc.default-vpc.id
 
@@ -93,12 +93,12 @@ resource "aws_security_group" "tfbc-sg" {
   }
 
   tags = {
-    Name = "tfbc-allow_http"
+    Name = "${var.cluster_name}-sg"
   }
 }
 
 resource "aws_lb" "tfbc-alb" {
-  name               = "tfbc-alb"
+  name               = "${var.cluster_name}-alb"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.default-subnets.ids
   security_groups    = [aws_security_group.tfbc-sg.id]
@@ -125,7 +125,7 @@ resource "aws_lb_listener" "tfbc-listener" {
 
 
 resource "aws_lb_target_group" "tfbc-tg" {
-  name     = "tfbc-tg"
+  name     = "${var.cluster_name}-tg"
   port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default-vpc.id
@@ -157,12 +157,3 @@ resource "aws_lb_listener_rule" "tfbc-rule" {
 }
 
 
-terraform {
-  backend "s3" {
-    bucket         = "tfbc-state"
-    key            = "stage/services/webserver-cluster/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "tfbc-locks"
-    encrypt        = true
-  }
-}
