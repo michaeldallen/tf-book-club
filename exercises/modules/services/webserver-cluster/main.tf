@@ -69,25 +69,37 @@ resource "aws_security_group" "tfbc-sg" {
   description = "Allow HTTP inbound traffic"
   vpc_id      = data.aws_vpc.default-vpc.id
 
-  ingress {
-    description = "HTTP from anywhere"
-    from_port   = local.server_port
-    to_port     = local.server_port
-    protocol    = local.tcp_protocol
-    cidr_blocks = local.all_ips
-  }
-
-  egress {
-    from_port   = local.any_port
-    to_port     = local.any_port
-    protocol    = local.any_protocol
-    cidr_blocks = local.all_ips
-  }
-
   tags = {
     Name = "${var.cluster_name}-sg"
   }
+
 }
+
+resource "aws_security_group_rule" "allow_http_inbound" {
+
+  type = "ingress"
+
+  security_group_id = aws_security_group.tfbc-sg.id
+
+  from_port   = local.server_port
+  to_port     = local.server_port
+  protocol    = local.tcp_protocol
+  cidr_blocks = local.all_ips
+}
+
+resource "aws_security_group_rule" "allow_all_outbound" {
+
+  type = "egress"
+
+  security_group_id = aws_security_group.tfbc-sg.id
+
+  from_port   = local.any_port
+  to_port     = local.any_port
+  protocol    = local.any_protocol
+  cidr_blocks = local.all_ips
+
+}
+
 
 resource "aws_lb" "tfbc-alb" {
   name               = "${var.cluster_name}-alb"
