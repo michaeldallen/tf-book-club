@@ -1,26 +1,16 @@
-data "terraform_remote_state" "db" {
-  backend = "s3"
-  config = {
-    bucket = "${var.db_remote_state_bucket}"
-    key    = "${var.db_remote_state_key}"
-    region = "us-east-1"
-  }
-}
-
-
 resource "aws_launch_template" "tfbc-lt" {
 
   name_prefix   = "${var.cluster_name}-"
-  image_id      = "ami-0df8c184d5f6ae949"
-  instance_type = "${var.instance_type}"
+  image_id      = local.image_id
+  instance_type = var.instance_type
 
   vpc_security_group_ids = [aws_security_group.tfbc-sg.id]
 
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
-    server_port = var.server_port
+    server_port  = local.server_port
     cluster_name = var.cluster_name
-    db_address  = data.terraform_remote_state.db.outputs.address
-    db_port     = data.terraform_remote_state.db.outputs.port
+    db_address   = data.terraform_remote_state.db.outputs.address
+    db_port      = data.terraform_remote_state.db.outputs.port
   }))
 
   lifecycle {
@@ -36,8 +26,8 @@ resource "aws_autoscaling_group" "tfbc-asg" {
 
   }
 
-  min_size            = var.min_size
-  max_size            = var.max_size
+  min_size = var.min_size
+  max_size = var.max_size
 
   vpc_zone_identifier = data.aws_subnets.default-subnets.ids
 
@@ -81,17 +71,17 @@ resource "aws_security_group" "tfbc-sg" {
 
   ingress {
     description = "HTTP from anywhere"
-    from_port   = var.server_port
-    to_port     = var.server_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = local.server_port
+    to_port     = local.server_port
+    protocol    = local.tcp_protocol
+    cidr_blocks = local.all_ips
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = local.any_port
+    to_port     = local.any_port
+    protocol    = local.any_protocol
+    cidr_blocks = local.all_ips
   }
 
   tags = {
@@ -109,7 +99,7 @@ resource "aws_lb" "tfbc-alb" {
 
 resource "aws_lb_listener" "tfbc-listener" {
   load_balancer_arn = aws_lb.tfbc-alb.arn
-  port              = var.server_port
+  port              = local.server_port
   protocol          = "HTTP"
 
   default_action {
@@ -128,7 +118,7 @@ resource "aws_lb_listener" "tfbc-listener" {
 
 resource "aws_lb_target_group" "tfbc-tg" {
   name     = "${var.cluster_name}-tg"
-  port     = var.server_port
+  port     = local.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default-vpc.id
 

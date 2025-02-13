@@ -1,5 +1,5 @@
 output "server-port" {
-  value = var.server_port
+  value = local.server_port
 }
 
 output "alb-dns-name" {
