@@ -12,12 +12,13 @@ resource "aws_launch_template" "tfbc-lt" {
 
   name_prefix   = "${var.cluster_name}-"
   image_id      = "ami-0df8c184d5f6ae949"
-  instance_type = "t2.micro"
+  instance_type = "${var.instance_type}"
 
   vpc_security_group_ids = [aws_security_group.tfbc-sg.id]
 
   user_data = base64encode(templatefile("${path.module}/user-data.sh", {
     server_port = var.server_port
+    cluster_name = var.cluster_name
     db_address  = data.terraform_remote_state.db.outputs.address
     db_port     = data.terraform_remote_state.db.outputs.port
   }))
@@ -35,8 +36,9 @@ resource "aws_autoscaling_group" "tfbc-asg" {
 
   }
 
-  min_size            = 2
-  max_size            = 10
+  min_size            = var.min_size
+  max_size            = var.max_size
+
   vpc_zone_identifier = data.aws_subnets.default-subnets.ids
 
   target_group_arns = [aws_lb_target_group.tfbc-tg.arn]

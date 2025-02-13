@@ -1,7 +1,7 @@
 module "mysql" {
   source = "../../../modules/data-stores/mysql"
 
-  cluster_name = "stage"
+  cluster_name = "prod"
 
 
 

@@ -21,3 +21,18 @@ variable "db_remote_state_key" {
   type = string
 }
 
+variable "instance_type" {
+  description = "the type of EC2 instance to run"
+  type = string
+}
+
+variable "min_size" {
+  description = "the minimum number of EC2 instances in the ASG"
+  type = number
+}
+
+variable "max_size" {
+  description = "the maximum number of EC2 instances in the ASG"
+  type = number
+}
+
