@@ -4,8 +4,10 @@ set -e
 set -u
 
 # Read AWS profile and region from terraform.tfvars
-AWS_PROFILE=$(grep -E '^aws_profile\s*=' terraform.tfvars | awk -F'"' '{print $2}')
-AWS_REGION=$(grep -E '^aws_region\s*=' terraform.tfvars | awk -F'"' '{print $2}')
+if [ -r terraform.tfvars ] ; then
+    AWS_PROFILE=$(grep -E '^aws_profile\s*=' terraform.tfvars | awk -F'"' '{print $2}')
+    AWS_REGION=$(grep -E '^aws_region\s*=' terraform.tfvars | awk -F'"' '{print $2}')
+fi
 
 # Read DynamoDB table name from backend.tf
 DYNAMODB_TABLE=$(grep -E 'dynamodb_table\s*=' *.tf | awk -F'"' '{print $2}')
@@ -14,8 +16,8 @@ DYNAMODB_TABLE=$(grep -E 'dynamodb_table\s*=' *.tf | awk -F'"' '{print $2}')
 #LOCK_ID="${PWD##*/}/terraform.tfstate"
 
 
-KEY=$(cat *.tf  | awk --field-separator='"' '/key *=/ { print $2 } ')
-BUCKET=$(cat *.tf  | awk --field-separator='"' '/bucket *=/ { print $2 } ')
+KEY=$(cat *.tf  | awk --field-separator='"' '/^ *key *=/ { print $2 } ')
+BUCKET=$(cat *.tf  | awk --field-separator='"' '/^ *bucket *=/ { print $2 } ')
 LOCK_ID="${BUCKET}/${KEY}"
 
 set | egrep '^(AWS_(PROFILE|REGION)|DYNAMODB_TABLE|KEY|BUCKET|LOCK_ID)=' | column --table --separator = --output-separator ': ' --table-right 1 | sed 's/^/    /'
@@ -25,8 +27,8 @@ query_lock() {
     aws dynamodb get-item \
         --table-name "$DYNAMODB_TABLE" \
         --key '{"LockID": {"S": "'"$LOCK_ID"'"}}' \
-        --region "$AWS_REGION" \
-        --profile "$AWS_PROFILE"
+        ${AWS_REGION:+--region "$AWS_REGION"} \
+        ${AWS_PROFILE:+--profile "$AWS_PROFILE"}
 }
 
 # Function to release the lock
@@ -34,8 +36,8 @@ release_lock() {
     aws dynamodb delete-item \
         --table-name "$DYNAMODB_TABLE" \
         --key '{"LockID": {"S": "'"$LOCK_ID"'"}}' \
-        --region "$AWS_REGION" \
-        --profile "$AWS_PROFILE"
+        ${AWS_REGION:+--region "$AWS_REGION"} \
+        ${AWS_PROFILE:+--profile "$AWS_PROFILE"}
 }
 
 # Main script
