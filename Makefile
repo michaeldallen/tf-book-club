@@ -44,6 +44,7 @@ env.tg.install : env.user
 env.tg.install.% : env.user
 	@tgswitch $*
 
+
 env.user.bin : ${HOME}/bin
 
 ${HOME}/bin :
@@ -117,6 +118,15 @@ tf.fmt :
 
 tf.fmt! : 
 	@terraform fmt *.tf | sed 's/$$/ formatted/'
+
+tg.init : 
+	find . -name terragrunt.hcl | while read tg; do d=$$(dirname $$tg); (cd $$d ; make tf.init); done
+
+tg.run-all.apply :
+	terragrunt run-all apply
+
+tg.run-all.destroy :
+	terragrunt run-all destroy
 
 
 tfbc.ch2.test : 
