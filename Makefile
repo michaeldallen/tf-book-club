@@ -122,6 +122,9 @@ tf.fmt! :
 tg.init : 
 	find . -name terragrunt.hcl | while read tg; do d=$$(dirname $$tg); (cd $$d ; make tf.init); done
 
+tg.run-all.plan :
+	terragrunt run-all plan
+
 tg.run-all.apply :
 	terragrunt run-all apply
 
