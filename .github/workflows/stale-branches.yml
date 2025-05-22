@@ -18,6 +18,7 @@ jobs:
       - name: Stale Branches
         uses: crs-k/stale-branches@v8.1.1
         with:
-          days-before-stale: 120
+          days-before-stale: 1
           dry-run: true
-          
+
+
