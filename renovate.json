@@ -3,5 +3,5 @@
   "extends": [
     "config:recommended"
   ],
-  dependency-dashboard-autoclose: true
+  "dependency-dashboard-autoclose": true
 }
